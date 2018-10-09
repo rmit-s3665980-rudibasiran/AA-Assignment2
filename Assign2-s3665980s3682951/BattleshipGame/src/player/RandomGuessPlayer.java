@@ -13,9 +13,9 @@ import java.util.Random;
  */
 public class RandomGuessPlayer implements Player{
 
+    // introduced variables
     public Boolean myShots [][]; // my guesses based on player type
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
-
     public ArrayList<Guess> myGuesses = new ArrayList<>();
     public ArrayList<Answer> myAnswers = new ArrayList<>();
     public int boardRow = 0;
@@ -101,7 +101,6 @@ public class RandomGuessPlayer implements Player{
         return a;
     } // end of getAnswer()
     
-   
     @Override
     public Guess makeGuess() {
         // To be implemented.
@@ -142,14 +141,7 @@ public class RandomGuessPlayer implements Player{
                 }
             }
         }
-
-        if (found) {
-            return g;
-        }
-        else {
-            return null;
-        }
-           
+        return ((found) ? g : null);
     } // end of makeGuess()
 
     @Override
@@ -162,12 +154,7 @@ public class RandomGuessPlayer implements Player{
     @Override
     public boolean noRemainingShips() {
         // To be implemented.
-        boolean allHit = false;
-
-        if(myShipsAreSinking.size() == 0) {
-            allHit  = true;
-        }
-        return allHit;
+        return ((myShipsAreSinking.size() == 0) ? true : false);
     } // end of noRemainingShips()
 
     // introduced methods
@@ -175,6 +162,4 @@ public class RandomGuessPlayer implements Player{
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
     }
-
-
 } // end of class RandomGuessPlayer

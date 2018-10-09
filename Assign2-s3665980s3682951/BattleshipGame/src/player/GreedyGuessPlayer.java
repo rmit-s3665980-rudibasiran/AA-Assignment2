@@ -13,9 +13,9 @@ import java.util.Random;
  */
 public class GreedyGuessPlayer  implements Player{
 
+    // introduced variables
     public Boolean myShots [][]; // my guesses based on player type
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
-
     public ArrayList<Guess> myGuesses = new ArrayList<>();
     public ArrayList<Answer> myAnswers = new ArrayList<>();
     public int boardRow = 0;
@@ -57,7 +57,7 @@ public class GreedyGuessPlayer  implements Player{
     @Override
     public Answer getAnswer(Guess guess) {
         // To be implemented.
-Answer a = new Answer ();
+        Answer a = new Answer ();
         a.isHit = false;
 
         if (guess != null && guess.row <= boardRow && guess.column <= boardCol) {
@@ -101,7 +101,6 @@ Answer a = new Answer ();
         return a;
     } // end of getAnswer()
 
-
     @Override
     public Guess makeGuess() {
         // To be implemented.
@@ -142,16 +141,8 @@ Answer a = new Answer ();
                 }
             }
         }
-
-        if (found) {
-            return g;
-        }
-        else {
-            return null;
-        }
-           
+        return ((found) ? g : null);
     } // end of makeGuess()
-
 
     @Override
     public void update(Guess guess, Answer answer) {
@@ -160,16 +151,10 @@ Answer a = new Answer ();
         myGuesses.add(guess);
     } // end of update()
 
-
     @Override
     public boolean noRemainingShips() {
         // To be implemented.
-        boolean allHit = false;
-
-        if(myShipsAreSinking.size() == 0) {
-            allHit  = true;
-        }
-        return allHit;
+        return ((myShipsAreSinking.size() == 0) ? true : false);
     } // end of noRemainingShips()
 
     // introduced methods
@@ -177,6 +162,4 @@ Answer a = new Answer ();
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
     }
-
-
 } // end of class GreedyGuessPlayer
