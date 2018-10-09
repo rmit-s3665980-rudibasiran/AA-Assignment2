@@ -1,9 +1,9 @@
 package player;
 
-import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 import world.World;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Random guess player (task A).
@@ -170,6 +170,7 @@ public class RandomGuessPlayer implements Player{
         return allHit;
     } // end of noRemainingShips()
 
+    // introduced methods
     public static int randomNumberInRange(int min, int max) {
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
