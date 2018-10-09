@@ -138,8 +138,7 @@ public class GreedyGuessPlayer  implements Player{
         myGuesses.add(guess);
 
         if (answer.isHit) {           
-            // to-do add potential coordinates to myTargetList - check up, down, left, right
-            Guess g = new Guess();
+            // add potential coordinates to myTargetList - check up, down, left, right
             int r = guess.row;
             int c = guess.column;
             
@@ -158,7 +157,6 @@ public class GreedyGuessPlayer  implements Player{
             // right
             if (c + 1 < boardCol - 1 && !myShots[r][c + 1] ) 
                 addToList(r, c + 1);
-            
         }   
 
     } // end of update()
@@ -261,7 +259,7 @@ public class GreedyGuessPlayer  implements Player{
 
     }
 
-    // generate shots based on checkerboard pattern
+    // generate shots based on previous hit guesses
     public Guess targetMode () {
         Guess g = new Guess();
         boolean found = false;
