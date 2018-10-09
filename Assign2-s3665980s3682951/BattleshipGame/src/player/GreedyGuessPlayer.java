@@ -14,23 +14,26 @@ import java.util.Random;
 public class GreedyGuessPlayer  implements Player{
 
     // introduced variables
-    public Boolean myShots [][]; // my guesses based on player type
+    public Boolean myShots [][]; // simple my guesses grid to track my shots
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
     public ArrayList<Guess> myGuesses = new ArrayList<>();
     public ArrayList<Answer> myAnswers = new ArrayList<>();
-    public int boardRow = 0;
+    public int boardRow = 0; // size of grid of board
     public int boardCol = 0;
-    public boolean debug = true;
-    public boolean debugGuess = false;
+    public boolean debug = false;
+    public boolean debugGuess = true;
 
     @Override
     public void initialisePlayer(World world) {
         // To be implemented.
+        
+        // grid size of world
         boardRow = world.numRow;
         boardCol = world.numColumn;
         myShots = new Boolean[boardRow][boardCol];
 
         // make a copy of world
+        // since world is passed only once and not public, we need to make a copy of it
         for (int i = 0;i < world.shipLocations.size(); i++) {
             myShipsAreSinking.add(world.shipLocations.get(i));
         }
@@ -112,6 +115,12 @@ public class GreedyGuessPlayer  implements Player{
         boolean found = false;
         boolean noCellsLeft = true;
 
+        if (debugGuess) {
+            System.out.println ("Number of Gueses: " + myGuesses.size());
+
+        }
+
+        
         for (int i = 0; i < myShots.length; i++) { 
             for (int j = 0; j < myShots[i].length; j++) { 
                 if (!myShots[i][j])  {
