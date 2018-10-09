@@ -137,27 +137,39 @@ public class GreedyGuessPlayer  implements Player{
         myAnswers.add(answer);
         myGuesses.add(guess);
 
-        if (answer.isHit) {           
-            // add potential coordinates to myTargetList - check up, down, left, right
-            int r = guess.row;
-            int c = guess.column;
-            
-            // up
-            if (r + 1 < boardRow - 1 && !myShots[r + 1][c]) 
-                addToList(r + 1, c);
-            
-            // down
-            if (r - 1 >= 0 && !myShots[r - 1][c] ) 
-                addToList(r - 1, c);
-            
-            // left
-            if (c - 1 >= 0 && !myShots[r][c - 1] ) 
-                addToList(r, c - 1);
-            
-            // right
-            if (c + 1 < boardCol - 1 && !myShots[r][c + 1] ) 
-                addToList(r, c + 1);
-        }   
+        if (answer.isHit) {
+            if (answer.shipSunk != null) {
+                // clear remaining target list since ship already sunk
+                myTargetList.clear();
+            }
+            else {
+                // add potential coordinates to myTargetList - check clockwise : right, down, left, up
+                int r = guess.row;
+                int c = guess.column;
+
+                // right
+                if (c + 1 < boardCol - 1) {
+                    addToTargetList(r, c + 1);
+                }
+
+                // down
+                if (r - 1 >= 0) {
+                    addToTargetList(r - 1, c);
+                }
+                    
+                // left
+                if (c - 1 >= 0) {
+                    addToTargetList(r, c - 1);
+                }
+                   
+                // up
+                if (r + 1 < boardRow - 1) {
+                    addToTargetList(r + 1, c);
+                }
+                    
+            }
+        }
+        
 
     } // end of update()
 
@@ -244,19 +256,23 @@ public class GreedyGuessPlayer  implements Player{
     }
 
     // add to targetting list if not already in
-    public void addToList(int r, int c) {
+    public void addToTargetList(int r, int c) {
         Guess g = new Guess();
         g.row = r;
         g.column = c;
-        boolean canAddToList = true;
-        for (int i = 0; i < myTargetList.size(); i++) {
-            if (myTargetList.get(i).row == g.row && myTargetList.get(i).column == g.column) {
-                canAddToList = false;
+        boolean found = false;
+        if (!myShots[r][c]) {
+            for (int i = 0; i < myTargetList.size(); i++) {
+                // check to see whether coordinate already added to targetted list
+                if (myTargetList.get(i).row == g.row && myTargetList.get(i).column == g.column) {
+                    found = true;
+                    break;
+                }
             }
+            
+            if (!found)
+                myTargetList.add(g);
         }
-        if (canAddToList)
-            myTargetList.add(g);
-
     }
 
     // generate shots based on previous hit guesses
@@ -264,7 +280,8 @@ public class GreedyGuessPlayer  implements Player{
         Guess g = new Guess();
         boolean found = false;
         if (myTargetList.size() > 0) {
-            g = myTargetList.get(0);
+            g.row = myTargetList.get(0).row;
+            g.column = myTargetList.get(0).column;
             myTargetList.remove(0);
             found = true;
             myShots[g.row][g.column] = true;
