@@ -163,7 +163,12 @@ public class GreedyGuessPlayer  implements Player{
         myAnswers.add(answer);
         myGuesses.add(guess);
 
-        if (answer.isHit) {
+        if (!answer.isHit) {
+            if (debugGuess) {
+                System.out.println("Shot Miss: " + guess.row + " | " + guess.column);
+            }
+        }
+        else if (answer.isHit) {
             if (debugGuess) {
                 System.out.println("Shot Hit: " + guess.row + " | " + guess.column);
             }
@@ -178,7 +183,6 @@ public class GreedyGuessPlayer  implements Player{
                 // uncomment the next line to show impact for adjacent ship layout
                 // myTargetList.clear(); 
                 
-
             }
             else {
                 // add potential coordinates to myTargetList - check clockwise : right, down, left, up
@@ -186,8 +190,8 @@ public class GreedyGuessPlayer  implements Player{
                 // the eye to spot/anticipate the next shot in a clockwise-like movement 
                 int r = guess.row;
                 int c = guess.column;
+
                 // right
-          
                 if (c + 1 < boardCol) {
                     addToTargetList(r, c + 1);
                 }

@@ -70,7 +70,7 @@ public class ProbabilisticGuessPlayer  implements Player{
         }
   
         // initialise matrix
-        calcProbabilty();
+        // calcProbabilty();
 
         // view my ships' locations: for checking purposes
         if (debug) {
@@ -152,13 +152,13 @@ public class ProbabilisticGuessPlayer  implements Player{
     public void update(Guess guess, Answer answer) {
         // To be implemented.
 
-        // recalculate probabilities
-        calcProbabilty();
-        
         myAnswers.add(answer);
         myGuesses.add(guess);
-
-        if (answer.isHit) {
+        if (!answer.isHit) {
+            myProbableShots[guess.row][guess.column] = 0;
+            calcProbabilty();
+        }
+        else if (answer.isHit) {
             if (debugGuess) {
                 System.out.println("Shot Hit: " + guess.row + " | " + guess.column);
             }
@@ -181,8 +181,8 @@ public class ProbabilisticGuessPlayer  implements Player{
                 }
 
                 // clear matrix
-                for (int i = 0; i < myShots.length; i++) { 
-                    for (int j = 0; j < myShots[i].length; j++) { 
+                for (int i = 0; i < myProbableShots.length; i++) { 
+                    for (int j = 0; j < myProbableShots[i].length; j++) { 
                         myProbableShots[i][j] = 0;
                     } 
                 }
@@ -219,6 +219,7 @@ public class ProbabilisticGuessPlayer  implements Player{
                 }           
             }
         }
+       
     } // end of update()
 
     @Override
@@ -351,7 +352,6 @@ public class ProbabilisticGuessPlayer  implements Player{
                     else {
                         System.out.print(myProbableShots[i][j] + " ");
                     }
-                    
                 }
                 System.out.println("");
 		    }
