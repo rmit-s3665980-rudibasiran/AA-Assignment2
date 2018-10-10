@@ -38,42 +38,11 @@ public class ProbabilisticGuessPlayer  implements Player{
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
     public boolean debugGuess = true; // debug guesses specifically
-    ArrayList<ProbabilityTable> probabilityTable = new ArrayList<>(); // probabality table
 
-    public class ProbabilityTable {
-		int row;
-		int column;
-		int count;
-    }
+    public ArrayList<World.ShipLocation> myProbableShipGuesses = new ArrayList<>(); // clone of world.shipLocations
+    public int myProbableShots [][]; // matrix of scores
     
-    public void caclProbabilty() {
-
-		for (int i = 0; i < boardRow; i++) {
-			for (int j = 0; j < boardCol; j++) {
-				if (!myShots[i][j]) { 
-                    ProbabilityTable probableCoord = new ProbabilityTable();
-					probableCoord.row = i;
-					probableCoord.column = j;
-
-					// calculate the configuration of the cell
-					for (int k = 0; k < myShots.length; k++) {
-                        checkNorthProb(probableCoord, k);
-                        // checkSouthProb(probableCoord, k);
-                        // checkEastProb(probableCoord, k);
-						// checkWestProb(probableCoord, k);						
-					}
-					probabilityTable.add(probableCoord);
-				}
-			}
-		}
-		for (int q = 0; q < probabilityTable.size(); q++) {
-			System.out.print(probabilityTable.get(q).count + "  ");
-			System.out.println("");
-		}
-    }
     
-    public void checkNorthProb(ProbabilityTable probableCoord, int k) {
-    }
     
     @Override
     public void initialisePlayer(World world) {
@@ -82,20 +51,27 @@ public class ProbabilisticGuessPlayer  implements Player{
         boardRow = world.numRow;
         boardCol = world.numColumn;
         myShots = new Boolean[boardRow][boardCol];
+        myProbableShots = new int[boardRow][boardCol];
 
         // init guesses
         for (int i = 0; i < myShots.length; i++) { 
             for (int j = 0; j < myShots[i].length; j++) { 
                 myShots[i][j] = false;
+                myProbableShots[i][j] = 0;
             } 
         }
 
         // make a copy of world (ships and it's coordinats) since world is not public
-        // once enemy guesses hit, remove from arraylist
+        // once enemy guesses hit, remove from arraylist myShipsAreSinking
+        // myProbableShipGuesses will be used to calculate probability of ship alignment and scores 
         for (int i = 0;i < world.shipLocations.size(); i++) {
             myShipsAreSinking.add(world.shipLocations.get(i));
+            myProbableShipGuesses.add(world.shipLocations.get(i));
         }
   
+        // initialise matrix
+        calcProbabilty();
+
         // view my ships' locations: for checking purposes
         if (debug) {
             for (World.ShipLocation shipLoc : myShipsAreSinking) {
@@ -175,6 +151,10 @@ public class ProbabilisticGuessPlayer  implements Player{
     @Override
     public void update(Guess guess, Answer answer) {
         // To be implemented.
+
+        // recalculate probabilities
+        calcProbabilty();
+        
         myAnswers.add(answer);
         myGuesses.add(guess);
 
@@ -192,7 +172,23 @@ public class ProbabilisticGuessPlayer  implements Player{
                 // thus, commented
                 // uncomment the next line to show impact for adjacent ship layout
                 // myTargetList.clear(); 
+
+                // remove ship
+                for (int i = 0; i < myProbableShipGuesses.size(); i++) {
+                    if (answer.shipSunk.name() == myProbableShipGuesses.get(i).ship.name()) {
+                        myProbableShipGuesses.remove(i);
+                    }
+                }
+
+                // clear matrix
+                for (int i = 0; i < myShots.length; i++) { 
+                    for (int j = 0; j < myShots[i].length; j++) { 
+                        myProbableShots[i][j] = 0;
+                    } 
+                }
                 
+                // recalculate matrix
+                calcProbabilty();
 
             }
             else {
@@ -236,20 +232,18 @@ public class ProbabilisticGuessPlayer  implements Player{
     // introduced methods
     
     // generate shots based on checkerboard pattern
-    public Guess huntMode () {
+    public Guess huntMode() {
 
         Guess g = new Guess ();
-        int r;
-        int c;
+        int r = -1;
+        int c = -1;
         boolean found = false;
         boolean noCellsLeft = true;
-        int shotGuessController; // control how the shots are generated based on checkerboard
+        int largest = -1;
 
         // simple boolean check to see whether any cells left
-        // modified from random guess as we know that 1 checkerboard pattern will definitely hit a ship
-
         for (int i = 0; i < myShots.length; i++) {
-            for (int j = (i % 2); j < myShots[i].length; j = j + 2) {
+            for (int j = 0; j < myShots[i].length; j++) {
                 if (!myShots[i][j]) {
                     noCellsLeft = false;
                     break;
@@ -264,23 +258,23 @@ public class ProbabilisticGuessPlayer  implements Player{
         if (!noCellsLeft) {
 		    while (!found) {
                 for (int i = 0; i < myShots.length; i++) {
-                    r = i;
-                    for (int j = (i % 2); j < myShots[i].length; j = j + 2) {
-                        c = j;
-                        if (!myShots[r][c]) {
-                            myShots[r][c] = true;
-                            
-                            if (debugGuess) {
-                                System.out.println("Guess: " + r + " | " + c);
+                    for (int j = 0; j < myShots[i].length; j++) {
+                        if (!myShots[i][j]) {
+                            if (myProbableShots[i][j] > largest) {
+                                largest = myProbableShots[i][j];
+                                r = i;
+                                c = j;
                             }
-                            g.row = r;
-                            g.column = c;
-                            found = true;
-                            break;
                         }
                     }
-                    if (found)
-                        break;
+                }
+                if (largest >= 0 && r >= 0 && c >= 0) {
+                    myProbableShots[r][c] = 0;
+                    g.row = r;
+                    g.column = c;
+                    myShots[r][c] = true;
+                    found = true;
+                    break;
                 }
             }
         }
@@ -330,4 +324,99 @@ public class ProbabilisticGuessPlayer  implements Player{
         }
         return ((found) ? g : null);
     }
+
+    // calculate probability of a cell having a ship
+    public void calcProbabilty() {
+    
+        for (int i = 0; i < myShots.length; i++) {
+            for (int j = 0; j < myShots[i].length; j++) {
+                if (!myShots[i][j]) {
+                    for (int s = 0; s < myProbableShipGuesses.size(); s++) {
+                        calculateShipRightwards (i, j, s);      // check right
+                        calculateShipDownwards  (i, j, s);      // check down
+                        calculateShipLeftwards  (i, j, s);      // check left
+                        calculateShipUpwards    (i, j, s);      // check up
+                    }
+                }
+            }
+        }
+		
+        if (debugGuess) {
+            System.out.println("Probable Matrix: ");
+		    for (int i = 0; i < myProbableShots.length; i++) {
+                for (int j = 0; j < myProbableShots[i].length; j++) {
+                    if (myShots[i][j]) {
+                        System.out.print("." + " ");    
+                    }
+                    else {
+                        System.out.print(myProbableShots[i][j] + " ");
+                    }
+                    
+                }
+                System.out.println("");
+		    }
+        }
+    }
+    
+    public void calculateShipRightwards(int r, int c, int s) {
+        int row = r;
+        int col = c + myProbableShipGuesses.get(s).ship.len();
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                col = c + i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myShots[row][col]) {
+                        myProbableShots[row][col]++;
+                    }
+                }
+            }
+        }
+    }
+
+    public void calculateShipDownwards(int r, int c, int s) {
+        int row = r - myProbableShipGuesses.get(s).ship.len();
+        int col = c;
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                row = r - i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myShots[row][col]) {
+                        myProbableShots[row][col]++;
+                    }
+                }
+            }
+        }
+    }
+
+    public void calculateShipLeftwards(int r, int c, int s) {
+        int row = r;
+        int col = c - myProbableShipGuesses.get(s).ship.len();
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                col = c - i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myShots[row][col]) {
+                        myProbableShots[row][col]++;
+                    }
+                }
+            }
+        }
+    }
+
+    public void calculateShipUpwards(int r, int c, int s) {
+        int row = r + myProbableShipGuesses.get(s).ship.len();
+        int col = c;
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                row = r + i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myShots[row][col]) {
+                        myProbableShots[row][col]++;
+                    }
+                }
+            }
+        }
+    }
+
+
 } // end of class ProbabilisticGuessPlayer

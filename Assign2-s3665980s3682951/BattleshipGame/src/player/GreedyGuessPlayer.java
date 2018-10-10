@@ -229,7 +229,6 @@ public class GreedyGuessPlayer  implements Player{
         int c;
         boolean found = false;
         boolean noCellsLeft = true;
-        int shotGuessController; // control how the shots are generated based on checkerboard
 
         // simple boolean check to see whether any cells left
         // modified from random guess as we know that 1 checkerboard pattern will definitely hit a ship
