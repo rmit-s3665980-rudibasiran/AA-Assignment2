@@ -38,7 +38,43 @@ public class ProbabilisticGuessPlayer  implements Player{
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
     public boolean debugGuess = true; // debug guesses specifically
+    ArrayList<ProbabilityTable> probabilityTable = new ArrayList<>(); // probabality table
 
+    public class ProbabilityTable {
+		int row;
+		int column;
+		int count;
+    }
+    
+    public void caclProbabilty() {
+
+		for (int i = 0; i < boardRow; i++) {
+			for (int j = 0; j < boardCol; j++) {
+				if (!myShots[i][j]) { 
+                    ProbabilityTable probableCoord = new ProbabilityTable();
+					probableCoord.row = i;
+					probableCoord.column = j;
+
+					// calculate the configuration of the cell
+					for (int k = 0; k < myShots.length; k++) {
+                        checkNorthProb(probableCoord, k);
+                        // checkSouthProb(probableCoord, k);
+                        // checkEastProb(probableCoord, k);
+						// checkWestProb(probableCoord, k);						
+					}
+					probabilityTable.add(probableCoord);
+				}
+			}
+		}
+		for (int q = 0; q < probabilityTable.size(); q++) {
+			System.out.print(probabilityTable.get(q).count + "  ");
+			System.out.println("");
+		}
+    }
+    
+    public void checkNorthProb(ProbabilityTable probableCoord, int k) {
+    }
+    
     @Override
     public void initialisePlayer(World world) {
         // To be implemented.
@@ -147,11 +183,17 @@ public class ProbabilisticGuessPlayer  implements Player{
                 System.out.println("Shot Hit: " + guess.row + " | " + guess.column);
             }
             if (answer.shipSunk != null) {
-                // clear remaining target list since ship already sunk
                 if (debugGuess) {
                     System.out.println("Shot Sunk: " + answer.shipSunk.name());
                 }
-                myTargetList.clear();
+
+                // clear remaining target list since ship already sunk
+                // however, a myTargetList.clear() might fool the AI as there could be adjacent ships
+                // thus, commented
+                // uncomment the next line to show impact for adjacent ship layout
+                // myTargetList.clear(); 
+                
+
             }
             else {
                 // add potential coordinates to myTargetList - check clockwise : right, down, left, up
