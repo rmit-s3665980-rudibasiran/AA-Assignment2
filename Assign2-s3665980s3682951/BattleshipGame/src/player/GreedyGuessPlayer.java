@@ -21,7 +21,23 @@ import java.util.Random;
 public class GreedyGuessPlayer  implements Player{
 
     // Guess Concept:
-    // ?
+    // Fire shots in checkerboard pattern beginning with coordinate 0,0
+    // If hit, add adjacent's cells coordinates - right, down, left, up - to a target list
+    // Right, down, left, up was chosen instead of north, south, east, west as it's easier for
+    //      the eye to spot/anticipate the next shot in a clockwise-like movement
+    // If target list is empty, push out a guess (target mode), else look for next in checkerboard pattern (hunt mode)
+    // Iterate through target list. If hit, add on more adjacent coordinates. If ship sunk, clear target list and return to hunt more
+
+    // Weakness: 
+    // If 2 ships are adjacent, a ship sunk will clear the target list and next shots are hunting mode
+    // Thus, myTargetList.clear() is commented out
+    // Tutor can uncomment to see the effects with adjacent ships layout
+    // E.g., as per below where AircraftCarrier and Cruiser are adjacent:
+    // AircraftCarrier 1 4 E S
+    // Frigate 6 6 S E
+    // Submarine 9 1 S E
+    // Cruiser 0 7 E N
+    // PatrolCraft 9 8 S W
 
     // Answer Concept:
     // Make a copy of world (ships and it's coordinats) since world is not public
@@ -152,16 +168,22 @@ public class GreedyGuessPlayer  implements Player{
                 System.out.println("Shot Hit: " + guess.row + " | " + guess.column);
             }
             if (answer.shipSunk != null) {
-                // clear remaining target list since ship already sunk
                 if (debugGuess) {
                     System.out.println("Shot Sunk: " + answer.shipSunk.name());
                 }
-                myTargetList.clear();
+
+                // clear remaining target list since ship already sunk
+                // however, a myTargetList.clear() might fool the AI as there could be adjacent ships
+                // thus, commented
+                // uncomment the next line to show impact for adjacent ship layout
+                // myTargetList.clear(); 
+                
+
             }
             else {
                 // add potential coordinates to myTargetList - check clockwise : right, down, left, up
                 // right, down, left, up was chosen instead of north, south, east, west as it's easier for
-                // the eye to spot/anticipate the next shot in a clock-like movement 
+                // the eye to spot/anticipate the next shot in a clockwise-like movement 
                 int r = guess.row;
                 int c = guess.column;
                 // right
@@ -184,11 +206,8 @@ public class GreedyGuessPlayer  implements Player{
                 if (r + 1 < boardRow) {
                     addToTargetList(r + 1, c);
                 }
-                    
             }
         }
-        
-
     } // end of update()
 
 

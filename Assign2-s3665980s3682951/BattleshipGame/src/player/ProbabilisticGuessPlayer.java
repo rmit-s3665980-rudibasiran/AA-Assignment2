@@ -31,6 +31,7 @@ public class ProbabilisticGuessPlayer  implements Player{
     
     public Boolean myShots [][]; // simple my guesses grid to track my shots
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
+    public ArrayList<Guess> myTargetList = new ArrayList<>(); // arraylist to keep track of what to hunt
     public ArrayList<Guess> myGuesses = new ArrayList<>(); // arraylist to keep track of my guesses
     public ArrayList<Answer> myAnswers = new ArrayList<>(); // arralist to keep track of my answers
     public int boardRow = 0; // size of grid of board
@@ -130,45 +131,9 @@ public class ProbabilisticGuessPlayer  implements Player{
     public Guess makeGuess() {
         // To be implemented.
 
-        Guess g = new Guess();
-
-        int r;
-        int c;
-        boolean found = false;
-        boolean noCellsLeft = true;
-
-        // simple boolean check to see whether any cells left
-        for (int i = 0; i < myShots.length; i++) { 
-            for (int j = 0; j < myShots[i].length; j++) { 
-                if (!myShots[i][j])  {
-                    noCellsLeft = false;
-                    break;
-                }
-            } 
-            if (!noCellsLeft) {
-                break;
-            }
-        }
-
-        // look for empty cell randomly
-        found = false;
-        if (!noCellsLeft) {
-            while (!found) {
-                r = randomNumberInRange(0, boardRow - 1);
-                c = randomNumberInRange(0, boardCol - 1);
-                if (!myShots[r][c]) {
-                    myShots[r][c] = true;
-                    g.row = r;
-                    g.column = c;
-                    found = true; 
-                    if (debugGuess) {
-                        System.out.println("Guess: " + r + " | " + c);
-                    }
-                }
-            }
-        }
-        // return guess if empty cell found, null otherwise
-        return ((found) ? g : null);
+        // check whethere there are targets to shoot at -> look at stored coordinates from update method
+        // else enter checkerboard hunting pattern
+        return (myTargetList.size() > 0 ? targetMode():huntMode());
     } // end of makeGuess()
 
     @Override
@@ -176,6 +141,46 @@ public class ProbabilisticGuessPlayer  implements Player{
         // To be implemented.
         myAnswers.add(answer);
         myGuesses.add(guess);
+
+        if (answer.isHit) {
+            if (debugGuess) {
+                System.out.println("Shot Hit: " + guess.row + " | " + guess.column);
+            }
+            if (answer.shipSunk != null) {
+                // clear remaining target list since ship already sunk
+                if (debugGuess) {
+                    System.out.println("Shot Sunk: " + answer.shipSunk.name());
+                }
+                myTargetList.clear();
+            }
+            else {
+                // add potential coordinates to myTargetList - check clockwise : right, down, left, up
+                // right, down, left, up was chosen instead of north, south, east, west as it's easier for
+                // the eye to spot/anticipate the next shot in a clock-like movement 
+                int r = guess.row;
+                int c = guess.column;
+                // right
+          
+                if (c + 1 < boardCol) {
+                    addToTargetList(r, c + 1);
+                }
+
+                // down
+                if (r - 1 >= 0) {
+                    addToTargetList(r - 1, c);
+                }
+                    
+                // left
+                if (c - 1 >= 0) {
+                    addToTargetList(r, c - 1);
+                }
+                   
+                // up
+                if (r + 1 < boardRow) {
+                    addToTargetList(r + 1, c);
+                }           
+            }
+        }
     } // end of update()
 
     @Override
@@ -188,10 +193,99 @@ public class ProbabilisticGuessPlayer  implements Player{
 
     // introduced methods
     
-    // random row and column generator based on size of board
-    public static int randomNumberInRange(int min, int max) {
-        Random random = new Random();
-        return random.nextInt((max - min) + 1) + min;
+    // generate shots based on checkerboard pattern
+    public Guess huntMode () {
+
+        Guess g = new Guess ();
+        int r;
+        int c;
+        boolean found = false;
+        boolean noCellsLeft = true;
+        int shotGuessController; // control how the shots are generated based on checkerboard
+
+        // simple boolean check to see whether any cells left
+        // modified from random guess as we know that 1 checkerboard pattern will definitely hit a ship
+
+        for (int i = 0; i < myShots.length; i++) {
+            for (int j = (i % 2); j < myShots[i].length; j = j + 2) {
+                if (!myShots[i][j]) {
+                    noCellsLeft = false;
+                    break;
+                }
+            }
+            if (!noCellsLeft) {
+                break;
+            }
+        }
+
+        found = false;
+        if (!noCellsLeft) {
+		    while (!found) {
+                for (int i = 0; i < myShots.length; i++) {
+                    r = i;
+                    for (int j = (i % 2); j < myShots[i].length; j = j + 2) {
+                        c = j;
+                        if (!myShots[r][c]) {
+                            myShots[r][c] = true;
+                            
+                            if (debugGuess) {
+                                System.out.println("Guess: " + r + " | " + c);
+                            }
+                            g.row = r;
+                            g.column = c;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        break;
+                }
+            }
+        }
+        // return guess if empty cell found, null otherwise
+        return ((found) ? g : null);
     }
 
+    // add to targetting list if not already in
+    public void addToTargetList(int r, int c) {
+    
+        boolean found = false;
+        if (!myShots[r][c]) {
+            for (int i = 0; i < myTargetList.size(); i++) {
+                // check to see whether coordinate already added to targetted list
+                if (myTargetList.get(i).row == r && myTargetList.get(i).column == c) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            // coordinate not found in target list, thus add
+            if (!found) {
+                Guess g = new Guess();
+                g.row = r;
+                g.column = c;
+                myTargetList.add(g);
+                if (debugGuess) {
+                    System.out.println("Added to Target: " + r + " | " + c);
+                }
+            }
+        }
+    }
+
+    // generate shots based on previous hit guesses
+    public Guess targetMode () {
+        Guess g = new Guess();
+        boolean found = false;
+        if (myTargetList.size() > 0) {
+            g.row = myTargetList.get(0).row;
+            g.column = myTargetList.get(0).column;
+            myTargetList.remove(0);
+            found = true;
+            myShots[g.row][g.column] = true;
+            if (debugGuess) {
+                System.out.println("Lining up Next Shot: " + g.row + " | " + g.column);
+            }
+        }
+        return ((found) ? g : null);
+    }
 } // end of class ProbabilisticGuessPlayer
