@@ -11,6 +11,12 @@ import java.util.Random;
  *
  * @author Youhan Xia, Jeffrey Chan
  */
+
+ /** 
+ * Rudi Basiran <s3665980@student.rmit.edu.au>
+ * John Michael Ariola Tubera <s3682951@student.rmit.edu.au>
+ */
+
 public class ProbabilisticGuessPlayer  implements Player{
 
     // Guess Concept:

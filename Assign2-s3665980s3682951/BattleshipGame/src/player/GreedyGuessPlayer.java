@@ -11,6 +11,13 @@ import java.util.Random;
  *
  * @author Youhan Xia, Jeffrey Chan
  */
+
+/** 
+ * Rudi Basiran <s3665980@student.rmit.edu.au>
+ * John Michael Ariola Tubera <s3682951@student.rmit.edu.au>
+ */
+
+
 public class GreedyGuessPlayer  implements Player{
 
     // Guess Concept:
@@ -32,7 +39,7 @@ public class GreedyGuessPlayer  implements Player{
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
     public boolean debugGuess = true; // debug guesses specifically
-    public boolean firstCheckerPattern = true; // whether checkerboard pattern has run it's first course
+
 
     @Override
     public void initialisePlayer(World world) {
@@ -127,6 +134,9 @@ public class GreedyGuessPlayer  implements Player{
     @Override
     public Guess makeGuess() {
         // To be implemented.
+
+        // check whethere there are targets to shoot at -> look at stored coordinates from update method
+        // else enter checkerboard hunting pattern
         return (myTargetList.size() > 0 ? targetMode():huntMode());
         
     } // end of makeGuess()
@@ -138,17 +148,25 @@ public class GreedyGuessPlayer  implements Player{
         myGuesses.add(guess);
 
         if (answer.isHit) {
+            if (debugGuess) {
+                System.out.println("Shot Hit: " + guess.row + " | " + guess.column);
+            }
             if (answer.shipSunk != null) {
                 // clear remaining target list since ship already sunk
+                if (debugGuess) {
+                    System.out.println("Shot Sunk: " + answer.shipSunk.name());
+                }
                 myTargetList.clear();
             }
             else {
                 // add potential coordinates to myTargetList - check clockwise : right, down, left, up
+                // right, down, left, up was chosen instead of north, south, east, west as it's easier for
+                // the eye to spot/anticipate the next shot in a clock-like movement 
                 int r = guess.row;
                 int c = guess.column;
-
                 // right
-                if (c + 1 < boardCol - 1) {
+          
+                if (c + 1 < boardCol) {
                     addToTargetList(r, c + 1);
                 }
 
@@ -163,7 +181,7 @@ public class GreedyGuessPlayer  implements Player{
                 }
                    
                 // up
-                if (r + 1 < boardRow - 1) {
+                if (r + 1 < boardRow) {
                     addToTargetList(r + 1, c);
                 }
                     
@@ -195,44 +213,26 @@ public class GreedyGuessPlayer  implements Player{
         int shotGuessController; // control how the shots are generated based on checkerboard
 
         // simple boolean check to see whether any cells left
-        for (int i = 0; i < myShots.length; i++) { 
-            for (int j = 0; j < myShots[i].length; j++) { 
-                if (!myShots[i][j])  {
+        // modified from random guess as we know that 1 checkerboard pattern will definitely hit a ship
+
+        for (int i = 0; i < myShots.length; i++) {
+            for (int j = (i % 2); j < myShots[i].length; j = j + 2) {
+                if (!myShots[i][j]) {
                     noCellsLeft = false;
                     break;
                 }
-            } 
+            }
             if (!noCellsLeft) {
                 break;
             }
         }
-       
+
         found = false;
         if (!noCellsLeft) {
 		    while (!found) {
                 for (int i = 0; i < myShots.length; i++) {
                     r = i;
-                    // if had reached last cell after 1st checkerboard pattern, do alternate type
-                    if (firstCheckerPattern) {
-                        shotGuessController = i % 2;
-                        if (debugGuess) {
-                            System.out.println("1st iteration: " + shotGuessController);
-                        }
-                    }
-                    else {
-                        if (i % 2 == 0) 
-                            shotGuessController = (i % 2) + 1;
-                        else
-                            shotGuessController = (i % 2) - 1;
-
-                        if (debugGuess) {
-                            System.out.println("2nd iteration: " + shotGuessController);
-                        }
-                    }
-
-                    for (int j = shotGuessController; j < myShots[i].length; j = j + 2) {
-                        if (i == myShots.length - 1 && j == myShots[i].length - 1)
-                            firstCheckerPattern = false; // if had reached last cell after 1st checkerboard pattern, do alternate type
+                    for (int j = (i % 2); j < myShots[i].length; j = j + 2) {
                         c = j;
                         if (!myShots[r][c]) {
                             myShots[r][c] = true;
@@ -257,21 +257,27 @@ public class GreedyGuessPlayer  implements Player{
 
     // add to targetting list if not already in
     public void addToTargetList(int r, int c) {
-        Guess g = new Guess();
-        g.row = r;
-        g.column = c;
+    
         boolean found = false;
         if (!myShots[r][c]) {
             for (int i = 0; i < myTargetList.size(); i++) {
                 // check to see whether coordinate already added to targetted list
-                if (myTargetList.get(i).row == g.row && myTargetList.get(i).column == g.column) {
+                if (myTargetList.get(i).row == r && myTargetList.get(i).column == c) {
                     found = true;
                     break;
                 }
             }
             
-            if (!found)
+            // coordinate not found in target list, thus add
+            if (!found) {
+                Guess g = new Guess();
+                g.row = r;
+                g.column = c;
                 myTargetList.add(g);
+                if (debugGuess) {
+                    System.out.println("Added to Target: " + r + " | " + c);
+                }
+            }
         }
     }
 
@@ -285,6 +291,9 @@ public class GreedyGuessPlayer  implements Player{
             myTargetList.remove(0);
             found = true;
             myShots[g.row][g.column] = true;
+            if (debugGuess) {
+                System.out.println("Lining up Next Shot: " + g.row + " | " + g.column);
+            }
         }
         return ((found) ? g : null);
     }
