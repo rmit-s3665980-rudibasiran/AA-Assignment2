@@ -59,13 +59,6 @@ public class GreedyGuessPlayer  implements Player{
     public boolean debugGuess = true; // debug guesses specifically
 
 
-    public enum Direction {
-        RIGHTWARDS,
-        DOWNWARDS,
-        LEFTWARDS,
-        UPWARDS
-    }
-
     @Override
     public void initialisePlayer(World world) {
         // To be implemented.
@@ -197,13 +190,28 @@ public class GreedyGuessPlayer  implements Player{
                 // add potential coordinates to myTargetList - check clockwise : right, down, left, up
                 // right, down, left, up was chosen instead of north, south, east, west as it's easier for
                 // the eye to spot/anticipate the next shot in a clockwise-like movement 
-  
+                int r = guess.row;
+                int c = guess.column;
 
-                addToTargetList(guess.row, guess.column, Direction.RIGHTWARDS);
-                addToTargetList(guess.row, guess.column, Direction.DOWNWARDS);
-                addToTargetList(guess.row, guess.column, Direction.LEFTWARDS);
-                addToTargetList(guess.row, guess.column, Direction.UPWARDS);
+                // right
+                if (c + 1 < boardCol) {
+                    addToTargetList(r, c + 1);
+                }
 
+                // down
+                if (r - 1 >= 0) {
+                    addToTargetList(r - 1, c);
+                }
+                    
+                // left
+                if (c - 1 >= 0) {
+                    addToTargetList(r, c - 1);
+                }
+                   
+                // up
+                if (r + 1 < boardRow) {
+                    addToTargetList(r + 1, c);
+                }
             }
         }
     } // end of update()
@@ -272,46 +280,26 @@ public class GreedyGuessPlayer  implements Player{
     }
 
     // add to targetting list if not already in
-    public void addToTargetList(int r, int c, Direction direction) {
-    
-        int row = r;
-        int col = c;
-
-        switch (direction) {
-            case RIGHTWARDS:   
-                col = c + 1;
-                break;
-            case DOWNWARDS:    
-                row = r - 1;
-                break;
-            case LEFTWARDS:    
-                col = c - 1;
-                break;
-            case UPWARDS:      
-                row = r + 1;
-                break;
-        }
+    public void addToTargetList(int r, int c) {
     
         boolean found = false;
-        if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-            if (!myShots[row][col]) {
-                for (int i = 0; i < myTargetList.size(); i++) {
-                    // check to see whether coordinate already added to targetted list
-                    if (myTargetList.get(i).row == row && myTargetList.get(i).column == col) {
-                        found = true;
-                        break;
-                    }
+        if (!myShots[r][c]) {
+            for (int i = 0; i < myTargetList.size(); i++) {
+                // check to see whether coordinate already added to targetted list
+                if (myTargetList.get(i).row == r && myTargetList.get(i).column == c) {
+                    found = true;
+                    break;
                 }
             }
             
             // coordinate not found in target list, thus add
             if (!found) {
                 Guess g = new Guess();
-                g.row = row;
-                g.column = col;
+                g.row = r;
+                g.column = c;
                 myTargetList.add(g);
                 if (debugGuess) {
-                    System.out.println("Added to Target: " + row + " | " + col);
+                    System.out.println("Added to Target: " + r + " | " + c);
                 }
             }
         }

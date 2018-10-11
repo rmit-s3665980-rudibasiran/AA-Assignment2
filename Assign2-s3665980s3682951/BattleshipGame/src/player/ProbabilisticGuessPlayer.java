@@ -64,13 +64,6 @@ public class ProbabilisticGuessPlayer  implements Player{
 		}
     }
 
-    public enum Direction {
-        RIGHTWARDS,
-        DOWNWARDS,
-        LEFTWARDS,
-        UPWARDS
-    }
-
     public GuessMatrix myProbableGuesses[][]; // matrix of probability scores & attempted guesses
     
     @Override
@@ -380,11 +373,10 @@ public class ProbabilisticGuessPlayer  implements Player{
             for (int j = 0; j < myProbableGuesses[i].length; j++) {
                 if (!myProbableGuesses[i][j].shotAttempted) {
                     for (int s = 0; s < myProbableShipGuesses.size(); s++) {
-                        calcProbabiltyShipLayout (i, j, s, Direction.RIGHTWARDS);
-                        calcProbabiltyShipLayout (i, j, s, Direction.DOWNWARDS);
-                        calcProbabiltyShipLayout (i, j, s, Direction.LEFTWARDS);
-                        calcProbabiltyShipLayout (i, j, s, Direction.UPWARDS);
-                        
+                        calculateShipRightwards (i, j, s);      // check right
+                        calculateShipDownwards  (i, j, s);      // check down
+                        calculateShipLeftwards  (i, j, s);      // check left
+                        calculateShipUpwards    (i, j, s);      // check up
                     }
                 }
             }
@@ -408,44 +400,57 @@ public class ProbabilisticGuessPlayer  implements Player{
 
     // see whether the remaining ships can fit into that cell based on length
     // do for rightwards, downwards, leftwards and upwards
-
-    public void calcProbabiltyShipLayout(int r, int c, int s, Direction direction) {
+    public void calculateShipRightwards(int r, int c, int s) {
         int row = r;
-        int col = c;
-
-        switch (direction) {
-            case RIGHTWARDS:   
-                col = c + myProbableShipGuesses.get(s).ship.len();
-                break;
-            case DOWNWARDS:    
-                row = r - myProbableShipGuesses.get(s).ship.len();
-                break;
-            case LEFTWARDS:    
-                col = c - myProbableShipGuesses.get(s).ship.len();
-                break;                     
-            case UPWARDS :      
-                row = r + myProbableShipGuesses.get(s).ship.len();
-                break;                   
-        }
-
+        int col = c + myProbableShipGuesses.get(s).ship.len();
 		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
 			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
-                
-                switch (direction) {
-                    case RIGHTWARDS:   
-                        col = c + i;
-                        break;
-                    case DOWNWARDS:    
-                        row = r - i;
-                        break;
-                    case LEFTWARDS:    
-                        col = c - i;
-                        break;
-                    case UPWARDS:      
-                        row = r + i;
-                        break;
+                col = c + i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myProbableGuesses[row][col].shotAttempted) {
+                        myProbableGuesses[row][col].score++;
+                    }
                 }
+            }
+        }
+    }
 
+    public void calculateShipDownwards(int r, int c, int s) {
+        int row = r - myProbableShipGuesses.get(s).ship.len();
+        int col = c;
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                row = r - i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myProbableGuesses[row][col].shotAttempted) {
+                        myProbableGuesses[row][col].score++;
+                    }
+                }
+            }
+        }
+    }
+
+    public void calculateShipLeftwards(int r, int c, int s) {
+        int row = r;
+        int col = c - myProbableShipGuesses.get(s).ship.len();
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                col = c - i;
+                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+                    if (!myProbableGuesses[row][col].shotAttempted) {
+                        myProbableGuesses[row][col].score++;
+                    }
+                }
+            }
+        }
+    }
+
+    public void calculateShipUpwards(int r, int c, int s) {
+        int row = r + myProbableShipGuesses.get(s).ship.len();
+        int col = c;
+		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
+			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
+                row = r + i;
                 if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
                     if (!myProbableGuesses[row][col].shotAttempted) {
                         myProbableGuesses[row][col].score++;
