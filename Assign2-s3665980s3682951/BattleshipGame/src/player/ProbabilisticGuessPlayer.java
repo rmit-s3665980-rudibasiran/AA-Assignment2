@@ -26,6 +26,10 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Make a copy of world (ships and it's coordinats) since world is not public
     // Once enemy guesses hit, remove from arraylist
 
+    // Average Wins/Losses against Random Player
+
+
+    // Average Wins/Losses against Greedy Player
 
     // introduced variables
     

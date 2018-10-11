@@ -43,7 +43,9 @@ public class GreedyGuessPlayer  implements Player{
     // Make a copy of world (ships and it's coordinats) since world is not public
     // Once enemy guesses hit, remove from arraylist
 
+    // Average Wins/Losses against Random Player
 
+    
     // introduced variables
     
     public Boolean myShots [][]; // simple my guesses grid to track my shots
