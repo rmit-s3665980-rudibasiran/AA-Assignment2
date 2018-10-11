@@ -26,9 +26,11 @@ public class GreedyGuessPlayer  implements Player{
     // Right, down, left, up was chosen instead of north, south, east, west as it's easier for
     //      the eye to spot/anticipate the next shot in a clockwise-like movement
     // If target list is empty, pop out a guess (target mode), else look for next in checkerboard pattern (hunt mode)
-    // Iterate through target list. If hit, add on more adjacent coordinates. If ship sunk, clear target list and return to hunt more
+    // Iterate through target list. If hit, add on more adjacent coordinates. 
+    // If ship sunk, clear target list (See ** Weakness) and return to hunt more
+    // No invalid/repeated guesses were made
 
-    // Weakness: 
+    // ** Weakness: 
     // If 2 ships are adjacent, a ship sunk will clear the target list and next shots are hunting mode
     // Thus, myTargetList.clear() is commented out
     // Tutor can uncomment to see the effects with adjacent ships layout
@@ -39,12 +41,57 @@ public class GreedyGuessPlayer  implements Player{
     // Cruiser 0 7 E N
     // PatrolCraft 9 8 S W
 
-    // Answer Concept:
-    // Make a copy of world (ships and it's coordinats) since world is not public
-    // Once enemy guesses hit, remove from arraylist
+    // Answer Concept (same as Random):
+    // Make a copy of world (ships and it's coordinates) since world is not public
+    // Once enemy guesses hit, remove coordinate from arraylist
+    // Once all of a ship's coordinates are hit, ship is removed from arraylist myShipsAreSinking
+    // Send myAnswer accordingly
 
     // Average Wins/Losses against Random Player
+    // 10 x 10 Board: Location 1 vs Location 2
+    // Game 1: random vs greedy
+    // Random - 98 rounds to destroy opponent's ships.
+    // Greedy - 58 rounds to destroy opponent's ships.
 
+    // Game 2: random vs greedy
+    // Random - 98 rounds to destroy opponent's ships.
+    // Greedy - 58 rounds to destroy opponent's ships.
+
+    // Game 3: random vs greedy
+    // Random - 93 rounds to destroy opponent's ships.
+    // Greedy - 58 rounds to destroy opponent's ships.
+
+    // Game 4: greedy vs random
+    // Random - 98 rounds to destroy opponent's ships.
+    // Greedy - 69 rounds to destroy opponent's ships.
+
+    // Game 5: greedy vs random
+    // Random - 100 rounds to destroy opponent's ships.
+    // Greedy - 69  rounds to destroy opponent's ships.
+  
+    // Game 6: greedy vs random
+    // Random - 97 rounds to destroy opponent's ships.
+    // Greedy - 69 rounds to destroy opponent's ships.
+
+    // 50 x 50 Board: Location 1 vs Location 2
+    // TimeUnit.MILLISECONDS.sleep(10)
+    // 1 minute to render the board
+    // 3 minutes to complete the game
+
+    // Game 1: random vs greedy
+    // Random - 2488 rounds to destroy opponent's ships.
+    // Greedy - 229 rounds to destroy opponent's ships.
+
+    // Game 2: greedy vs random
+    // Random - 2429 rounds to destroy opponent's ships.
+    // Greedy - 178 rounds to destroy opponent's ships.
+
+    // Observations:
+    // Given the same location files 1 & 2, Greedy Player will always have the same number of rounds as
+    //      it's very predictable due to the checkerboard pattern
+    // Random Player will almost always take > 95% of rounds
+    // Greedy Player will win all the time against Random Player
+    // In bigger board (50x50), Greedy Player will take about 7% of 2500 rounds whilst Random Player again takes > 95% rounds
 
     // introduced variables
     
@@ -52,12 +99,11 @@ public class GreedyGuessPlayer  implements Player{
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
     public ArrayList<Guess> myTargetList = new ArrayList<>(); // arraylist to keep track of what to hunt
     public ArrayList<Guess> myGuesses = new ArrayList<>(); // arraylist to keep track of my guesses
-    public ArrayList<Answer> myAnswers = new ArrayList<>(); // arralist to keep track of my answers
+    public ArrayList<Answer> myAnswers = new ArrayList<>(); // arraylist to keep track of my answers (reponse to other player's shots)
     public int boardRow = 0; // size of grid of board
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
     public boolean debugGuess = true; // debug guesses specifically
-
 
     @Override
     public void initialisePlayer(World world) {
@@ -182,7 +228,8 @@ public class GreedyGuessPlayer  implements Player{
                 // clear remaining target list since ship already sunk
                 // however, a myTargetList.clear() might fool the AI as there could be adjacent ships
                 // thus, commented
-                // uncomment the next line to show impact for adjacent ship layout
+
+                // uncomment myTargetList.clear() to show impact for adjacent ship layout
                 // myTargetList.clear(); 
                 
             }

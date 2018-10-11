@@ -20,20 +20,23 @@ import java.util.Random;
 public class RandomGuessPlayer implements Player{
 
     // Guess Concept:
-    // The idea is to make use of a simply boolean array, the same size of the board, to keep track of shots fired.
-    // Once any/an empty cell(s) are detected, a random generator will find an empty cell and fire a guess
+    // The idea is to make use of a simply boolean array (myShots), the same size of the board, to keep track of shots fired.
+    // Once any/an empty cell(s) are detected, a random generator will find an empty cell and fire a guess (myGuess)
     // It will then change the false (empty) to true (shot fired at that coodinate)
+    // No invalid/repeated guesses were made
 
     // Answer Concept:
     // Make a copy of world (ships and it's coordinates) since world is not public
-    // Once enemy guesses hit, remove from arraylist
+    // Once enemy guesses hit, remove coordinate from arraylist
+    // Once all of a ship's coordinates are hit, ship is removed from arraylist myShipsAreSinking
+    // Send myAnswer accordingly
 
     // introduced variables
     
     public Boolean myShots [][]; // simple my guesses grid to track my shots
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
     public ArrayList<Guess> myGuesses = new ArrayList<>(); // arraylist to keep track of my guesses
-    public ArrayList<Answer> myAnswers = new ArrayList<>(); // arralist to keep track of my answers
+    public ArrayList<Answer> myAnswers = new ArrayList<>(); // arraylist to keep track of my answers (reponse to other player's shots)
     public int boardRow = 0; // size of grid of board
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
@@ -55,7 +58,7 @@ public class RandomGuessPlayer implements Player{
             } 
         }
 
-        // make a copy of world (ships and it's coordinats) since world is not public
+        // make a copy of world (ships and it's coordinates) since world is not public
         // once enemy guesses hit, remove from arraylist
         for (int i = 0;i < world.shipLocations.size(); i++) {
             myShipsAreSinking.add(world.shipLocations.get(i));
@@ -177,7 +180,7 @@ public class RandomGuessPlayer implements Player{
     @Override
     public void update(Guess guess, Answer answer) {
         // To be implemented.
-        // not used in random but tracked nonetheless for subsdquent types of player implementation
+        // not used in random but tracked nonetheless for subsequent types of player implementation
         myAnswers.add(answer);
         myGuesses.add(guess);
     } // end of update()

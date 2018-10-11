@@ -27,6 +27,7 @@ public class ProbabilisticGuessPlayer  implements Player{
     // In hunt mode, we find the cell with the largest probabilty score and push out as a guess
     // Initially, we took the first occurrence of the largest but decided to make it random
     // as first occurrence will traverse a very big board like 50x50 slowly
+    // No invalid/repeated guesses were made
 
     // If there is a hit, it goes into target mode which is the same exact implementation of Greedy player where coordinates of the
     // right, down, left and up of the hit cell is added to a target list
@@ -34,9 +35,11 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Iterate through target list. If hit again, add on more adjacent coordinates.
     // Again, target list is not cleared when ship is sunk as there could be adjacent ships
 
-    // Answer Concept:
+    // Answer Concept (same as Random):
     // Make a copy of world (ships and it's coordinates) since world is not public
-    // Once enemy guesses hit, remove from arraylist
+    // Once enemy guesses hit, remove coordinate from arraylist
+    // Once all of a ship's coordinates are hit, ship is removed from arraylist myShipsAreSinking
+    // Send myAnswer accordingly
 
     // Average Wins/Losses against Random Player
 
@@ -48,14 +51,14 @@ public class ProbabilisticGuessPlayer  implements Player{
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
     public ArrayList<Guess> myTargetList = new ArrayList<>(); // arraylist to keep track of what to hunt
     public ArrayList<Guess> myGuesses = new ArrayList<>(); // arraylist to keep track of my guesses
-    public ArrayList<Answer> myAnswers = new ArrayList<>(); // arralist to keep track of my answers
+    public ArrayList<Answer> myAnswers = new ArrayList<>(); // arraylist to keep track of my answers (reponse to other player's shots)
     public int boardRow = 0; // size of grid of board
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
     public boolean debugGuess = true; // debug guesses specifically
-    public ArrayList<World.ShipLocation> myProbableShipGuesses = new ArrayList<>(); // another shipLocations but only use ship length
+    public ArrayList<World.ShipLocation> myProbableShipGuesses = new ArrayList<>(); // another shipLocations but using only ship length
 
-    // guess matric class
+    // guess matric class: similar to Random and Greedy myShots tracking method except with the addition of a probability score
     class GuessMatrix {
         boolean shotAttempted = false;
         int score = 0;
