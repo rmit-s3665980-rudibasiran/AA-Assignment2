@@ -25,7 +25,7 @@ public class GreedyGuessPlayer  implements Player{
     // If hit, add adjacent's cells coordinates - right, down, left, up - to a target list
     // Right, down, left, up was chosen instead of north, south, east, west as it's easier for
     //      the eye to spot/anticipate the next shot in a clockwise-like movement
-    // If target list is empty, push out a guess (target mode), else look for next in checkerboard pattern (hunt mode)
+    // If target list is empty, pop out a guess (target mode), else look for next in checkerboard pattern (hunt mode)
     // Iterate through target list. If hit, add on more adjacent coordinates. If ship sunk, clear target list and return to hunt more
 
     // Weakness: 
@@ -45,7 +45,7 @@ public class GreedyGuessPlayer  implements Player{
 
     // Average Wins/Losses against Random Player
 
-    
+
     // introduced variables
     
     public Boolean myShots [][]; // simple my guesses grid to track my shots
@@ -75,7 +75,7 @@ public class GreedyGuessPlayer  implements Player{
             } 
         }
 
-        // make a copy of world (ships and it's coordinats) since world is not public
+        // make a copy of world (ships and it's coordinates) since world is not public
         // once enemy guesses hit, remove from arraylist
         for (int i = 0;i < world.shipLocations.size(); i++) {
             myShipsAreSinking.add(world.shipLocations.get(i));
@@ -305,7 +305,8 @@ public class GreedyGuessPlayer  implements Player{
         }
     }
 
-    // generate shots based on previous hit guesses
+    // generate shots based on previous hit guesses, remove after return
+    // targetlist is not cleared if ship sunk to cater for probable adjacent ship layout placement
     public Guess targetMode () {
         Guess g = new Guess();
         boolean found = false;
