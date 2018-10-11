@@ -103,7 +103,7 @@ public class GreedyGuessPlayer  implements Player{
     public int boardRow = 0; // size of grid of board
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
-    public boolean debugGuess = true; // debug guesses specifically
+    public boolean debugGuess = false; // debug guesses specifically
 
     @Override
     public void initialisePlayer(World world) {

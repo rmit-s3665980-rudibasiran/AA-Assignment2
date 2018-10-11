@@ -23,10 +23,15 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Create array class GuessMatrix which consists of int score to keep track of probability of that cell having a ship
     // and a boolean (shotAttempted) which tracks whether that cell's has been attempted; this boolean is similar to what
     // was implemented in the Random and Greedy player model
-    // A cell score is increased when it can fit the length of the ship upwards, downwards, rightwards and leftwards
+    // A cell score (probability) is increased when it can fit the length of the ship upwards, downwards, rightwards and leftwards
+    // This is done for each row and each column for each ship and for cells which has not been sent as a guess
+    // If the matrix is not cleared, this implementation takes longer, as long as Random
+    // This is probably due to large scores being kept
     // In hunt mode, we find the cell with the largest probabilty score and push out as a guess
-    // Initially, we took the first occurrence of the largest but decided to make it random
+    // Initially, we took the first occurrence of the largest score but decided to make it random
     // as first occurrence will traverse a very big board like 50x50 slowly
+    // Once a cell has been indicated as hit/miss, the matrix is cleared and probabilites recalculated again
+    // If a ship is sunk, again, the matrix is cleared and probablilites recalculated but with 1 lesser ship
     // No invalid/repeated guesses were made
 
     // If there is a hit, it goes into target mode which is the same exact implementation of Greedy player where coordinates of the
@@ -42,9 +47,96 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Send myAnswer accordingly
 
     // Average Wins/Losses against Random Player
+    // 10 x 10 Board: Location 1 vs Location 2
+    // Game 1: random vs prob
+    // Random   - 95 rounds to destroy opponent's ships.
+    // Prob     - 54 rounds to destroy opponent's ships.
 
+    // Game 2: random vs prob
+    // Random   - 97 rounds to destroy opponent's ships.
+    // Prob     - 49 rounds to destroy opponent's ships.
+
+    // Game 3: random vs prob
+    // Random   - 94 rounds to destroy opponent's ships.
+    // Prob     - 54 rounds to destroy opponent's ships.
+
+    // Game 4: prob vs random
+    // Random   - 100 rounds to destroy opponent's ships.
+    // Prob     - 79 rounds to destroy opponent's ships.
+
+    // Game 5: prob vs random
+    // Random   - 98  rounds to destroy opponent's ships.
+    // Prob     - 71  rounds to destroy opponent's ships.
+
+    // Game 6: prob vs random
+    // Random   - 96  rounds to destroy opponent's ships.
+    // Prob     - 66  rounds to destroy opponent's ships.
+
+    // 50 x 50 Board: Location 1 vs Location 2
+    // TimeUnit.MILLISECONDS.sleep(10)
+    // 1 minute to render the board
+    // 3 minutes to complete the game
+
+    // Game 1: random vs greedy
+    // Random   - 2449 rounds to destroy opponent's ships.
+    // Prob     - 810 rounds to destroy opponent's ships.
+
+    // Game 2: greedy vs random
+    // Random   - 2495 rounds to destroy opponent's ships.
+    // Prob     - 936 rounds to destroy opponent's ships.
+
+    // Observations:
+    // Prob always wins against Random
+    // Again, Random takes about > 95% rounds
+    // Prob takes between 49 to 79, average of 62% of rounds
+    // For bigger grids, Random is > 95% whilst Prob is about 34% efficiency
 
     // Average Wins/Losses against Greedy Player
+
+    // 10 x 10 Board: Location 1 vs Location 2
+    // Game 1: greedy vs prob
+    // Greedy   - 69 rounds to destroy opponent's ships.
+    // Prob     - 67 rounds to destroy opponent's ships.
+
+    // Game 2: greedy vs prob
+    // Greedy   - 69 rounds to destroy opponent's ships.
+    // Prob     - 49 rounds to destroy opponent's ships.
+
+    // Game 3: greedy vs prob
+    // Greedy   - 69 rounds to destroy opponent's ships.
+    // Prob     - 52 rounds to destroy opponent's ships.
+
+    // Game 4: prob vs greedy
+    // Greedy   - 58 rounds to destroy opponent's ships.
+    // Prob     - 72 rounds to destroy opponent's ships.
+
+    // Game 5: prob vs greedy
+    // Greedy   - 58 rounds to destroy opponent's ships.
+    // Prob     - 75 rounds to destroy opponent's ships.
+
+    // Game 6: prob vs greedy
+    // Greedy   - 58 rounds to destroy opponent's ships.
+    // Prob     - 73 rounds to destroy opponent's ships.
+
+    // 50 x 50 Board: Location 1 vs Location 2
+    // TimeUnit.MILLISECONDS.sleep(10)
+    // 1 minute to render the board
+    // 1 minute to complete the game
+
+    // Game 1: greedy vs prob
+    // Greedy   - 229 rounds to destroy opponent's ships.
+    // Prob     - 931 rounds to destroy opponent's ships.
+
+    // Game 2: prob vs greedy
+    // Greedy   - 178 rounds to destroy opponent's ships.
+    // Prob     - 942 rounds to destroy opponent's ships.
+
+    // Observations:
+    // Draw
+    // Probability seems to take longer for layout 2 but is very good for layout 1
+    // Greedy will take longer to execute if the ships are higher up the board from the starting checkerboard pattern
+    //      assuming we start from 0,0
+  
 
     // introduced variables
    
@@ -55,7 +147,7 @@ public class ProbabilisticGuessPlayer  implements Player{
     public int boardRow = 0; // size of grid of board
     public int boardCol = 0; // size of grid of board
     public boolean debug = false; // debug general
-    public boolean debugGuess = true; // debug guesses specifically
+    public boolean debugGuess = false; // debug guesses specifically
     public ArrayList<World.ShipLocation> myProbableShipGuesses = new ArrayList<>(); // another shipLocations but using only ship length
 
     // guess matric class: similar to Random and Greedy myShots tracking method except with the addition of a probability score
@@ -183,11 +275,11 @@ public class ProbabilisticGuessPlayer  implements Player{
             // set score to 0 as it has missed so that it will not be amongst those with the largest probability score
             myProbableGuesses[guess.row][guess.column].score = 0;
 
-            // clear matrix - should?
-            // clear_matrix();
+            // clear matrix
+            clear_matrix();
 
-            // recalculate probability matrix?
-            // calcProbabilty();
+            // recalculate probability matrix
+            calcProbabilty();
         }
         else if (answer.isHit) {
             if (debugGuess) {
@@ -211,8 +303,8 @@ public class ProbabilisticGuessPlayer  implements Player{
                     }
                 }
 
-                // clear matrix - should?
-                // clear_matrix();
+                // clear matrix
+                clear_matrix();
                 
                 // recalculate probability matrix
                 calcProbabilty();
