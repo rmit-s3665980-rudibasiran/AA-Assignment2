@@ -302,7 +302,7 @@ public class ProbabilisticGuessPlayer  implements Player{
         myGuesses.add(guess);
         if (!answer.isHit) {
             // set score to 0 as it has missed so that it will not be amongst those with the largest probability score
-            myProbableGuesses[guess.row][guess.column].score = 0;
+            myProbableGuesses[guess.row][guess.column].score = 0; // redundant - shot had been sent, shotAttempt = true
 
             // clear matrix
             clear_matrix();
@@ -325,7 +325,7 @@ public class ProbabilisticGuessPlayer  implements Player{
                 // uncomment the next line to show impact for adjacent ship layout
                 // myTargetList.clear(); 
 
-                // remove ship to recalculate probability matrix all over again with 1 lesser ship
+                // remove ship to recalculate probability matrix
                 for (int i = 0; i < myProbableShipGuesses.size(); i++) {
                     if (answer.shipSunk.name() == myProbableShipGuesses.get(i).ship.name()) {
                         myProbableShipGuesses.remove(i);
@@ -335,7 +335,7 @@ public class ProbabilisticGuessPlayer  implements Player{
                 // clear matrix
                 clear_matrix();
                 
-                // recalculate probability matrix
+                // recalculate probability matrix all over again but with 1 lesser ship
                 calcProbabilty();
 
             }
@@ -423,7 +423,7 @@ public class ProbabilisticGuessPlayer  implements Player{
                
                 // initially, we took the first occurrence of the largest but decided to make it random
                 // as first occurrence will traverse a very big board 50x50 slowly in draw mode
-                // in non-rendering more, we can probably get away with using the first largest score
+                // in non-rendering mode, we can probably get away with using the first largest score
                 boolean randomLargestFound = false;
                 while (!randomLargestFound) {
                     
@@ -497,7 +497,7 @@ public class ProbabilisticGuessPlayer  implements Player{
         for (int i = 0; i < myProbableGuesses.length; i++) {
             for (int j = 0; j < myProbableGuesses[i].length; j++) {
                 if (!myProbableGuesses[i][j].shotAttempted) {
-                    for (int s = 0; s < myProbableShipGuesses.size(); s++) {
+                    for (int s = 0; s < myProbableShipGuesses.size(); s++) { // for each remaining ship, do:
                         calculateShipLayoutProb (i, j, s, RIGHTWARDS);  // check right
                         calculateShipLayoutProb (i, j, s, DOWNWARDS);   // check down
                         calculateShipLayoutProb (i, j, s, LEFTWARDS);   // check left
@@ -525,11 +525,15 @@ public class ProbabilisticGuessPlayer  implements Player{
 
     // see whether the remaining ships can fit into that cell based on length
     // do for rightwards, downwards, leftwards and upwards
+    // switch used to enhance readability and reusability of code; initially, we had 4 separate methods:
+    // - calculateShipLayoutRightwards    (int r, int c, int s)
+    // - calculateShipLayoutDownwards     (int r, int c, int s)
+    // - calculateShipLayoutLeftwards     (int r, int c, int s)
+    // - calculateShipLayoutUpwards       (int r, int c, int s)
     public void calculateShipLayoutProb(int r, int c, int s, int direction) {
         int row = r;
         int col = c;
 
-        // switch used to enhance readability and reusability of code
         switch (direction) {
             case RIGHTWARDS:
                 col = c + myProbableShipGuesses.get(s).ship.len();
@@ -572,6 +576,7 @@ public class ProbabilisticGuessPlayer  implements Player{
         }
     }
 
+    // set all scores to 0
     public void clear_matrix() {
         for (int i = 0; i < myProbableGuesses.length; i++) { 
             for (int j = 0; j < myProbableGuesses[i].length; j++) { 
