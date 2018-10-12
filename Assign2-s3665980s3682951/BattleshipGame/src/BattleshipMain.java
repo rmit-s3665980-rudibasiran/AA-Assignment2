@@ -192,21 +192,41 @@ public class BattleshipMain {
                     }
 
                 }
-                System.err.println("Player 1 took " + p1Rounds +
-                    " rounds to destroy opponent's ships.");
-                System.err.println("Player 2 took " + p2Rounds +
-                    " rounds to destroy opponent's ships.");
+                if (p1 instanceof RandomGuessPlayer) {
+                    System.err.println("P1 | RandomGuessPlayer: " + p1Rounds + (p1Rounds < p2Rounds ? " *":"")   );
+                }
+                else if (p1 instanceof GreedyGuessPlayer) {
+                    System.err.println("P1 | GreedyGuessPlayer: " + p1Rounds + (p1Rounds < p2Rounds ? " *":"") );
+                }
+                else if (p1 instanceof ProbabilisticGuessPlayer) {
+                    System.err.println("P1 | ProbabilisticGuessPlayer: " + p1Rounds + (p1Rounds < p2Rounds ? " *":"") );
+                }
 
-                // determine who won or is it a draw
-                if (p1Rounds < p2Rounds) {
-                    System.err.println("Player 1 wins.");
+                if (p2 instanceof RandomGuessPlayer) {
+                    System.err.println("P2 | RandomGuessPlayer: " + p2Rounds + (p1Rounds > p2Rounds ? " *":"") );
                 }
-                else if (p1Rounds > p2Rounds) {
-                    System.err.println("Player 2 wins.");
+                else if (p2 instanceof GreedyGuessPlayer) {
+                    System.err.println("P2 | GreedyGuessPlayer: " + p2Rounds + (p1Rounds > p2Rounds ? " *":"") );
                 }
-                else {
-                    System.err.println("It is a draw.");
+                else if (p2 instanceof ProbabilisticGuessPlayer) {
+                    System.err.println("P2 | ProbabilisticGuessPlayer: " + p2Rounds + (p1Rounds > p2Rounds ? " *":"") );
                 }
+
+                // System.err.println("Player 1 took " + p1Rounds +
+                //     " rounds to destroy opponent's ships.");
+                // System.err.println("Player 2 took " + p2Rounds +
+                //     " rounds to destroy opponent's ships.");
+
+                // // determine who won or is it a draw
+                // if (p1Rounds < p2Rounds) {
+                //     System.err.println("Player 1 wins.");
+                // }
+                // else if (p1Rounds > p2Rounds) {
+                //     System.err.println("Player 2 wins.");
+                // }
+                // else {
+                //     System.err.println("It is a draw.");
+                // }
 
                 // if not null, means we should log final game results
                 if (logWriter != null) {

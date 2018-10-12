@@ -19,13 +19,17 @@ import java.util.Random;
 
 public class RandomGuessPlayer implements Player{
 
+    /////////////////////////////////////////////
     // Guess Concept:
+    /////////////////////////////////////////////
     // The idea is to make use of a simply boolean array (myShots), the same size of the board, to keep track of shots fired.
     // Once any/an empty cell(s) are detected, a random generator will find an empty cell and fire a guess (myGuess)
     // It will then change the false (empty) to true (shot fired at that coodinate)
     // No invalid/repeated guesses were made
 
+    /////////////////////////////////////////////
     // Answer Concept:
+    /////////////////////////////////////////////
     // Make a copy of world (ships and it's coordinates) since world is not public
     // Once enemy guesses hit, remove coordinate from arraylist
     // Once all of a ship's coordinates are hit, ship is removed from arraylist myShipsAreSinking
@@ -115,6 +119,7 @@ public class RandomGuessPlayer implements Player{
                     }
                 }
                 // if ship no longer have coordinates ==> sunk!
+                // remove ship
                 if (myShipsAreSinking.get(i).coordinates.size() == 0) {
                     if (debug) {
                         System.out.println("Sunk : " + myShipsAreSinking.get(i).ship.name());
@@ -157,6 +162,7 @@ public class RandomGuessPlayer implements Player{
         }
 
         // look for empty cell randomly
+        // mark as true (guessed)
         found = false;
         if (!noCellsLeft) {
             while (!found) {

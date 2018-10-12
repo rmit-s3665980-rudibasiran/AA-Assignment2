@@ -20,17 +20,21 @@ import java.util.Random;
 
 public class GreedyGuessPlayer  implements Player{
 
+    /////////////////////////////////////////////
     // Guess Concept:
+    /////////////////////////////////////////////
     // Fire shots in checkerboard pattern beginning with coordinate 0,0
     // If hit, add adjacent's cells coordinates - right, down, left, up - to a target list
     // Right, down, left, up was chosen instead of north, south, east, west as it's easier for
     //      the eye to spot/anticipate the next shot in a clockwise-like movement
-    // If target list is empty, pop out a guess (target mode), else look for next in checkerboard pattern (hunt mode)
+    // If target list is not empty, pop out a guess (target mode), else look for next in checkerboard pattern (hunt mode)
     // Iterate through target list. If hit, add on more adjacent coordinates. 
-    // If ship sunk, clear target list (See ** Weakness) and return to hunt more
+    // If ship sunk, clear target list (See ** Weakness) and return to hunt mode
     // No invalid/repeated guesses were made
 
-    // ** Weakness: 
+    /////////////////////////////////////////////
+    // ** Weakness (1): 
+    /////////////////////////////////////////////
     // If 2 ships are adjacent, a ship sunk will clear the target list and next shots are hunting mode
     // Thus, myTargetList.clear() is commented out
     // Tutor can uncomment to see the effects with adjacent ships layout
@@ -41,13 +45,25 @@ public class GreedyGuessPlayer  implements Player{
     // Cruiser 0 7 E N
     // PatrolCraft 9 8 S W
 
+    /////////////////////////////////////////////
+    // ** Weakness (2): 
+    /////////////////////////////////////////////
+    // This checkerboard pattern needs to be enhanced because we know that all the ships have at least length 2
+    // If a new ship with just 1x1 is introduced, Greedy may never find it
+    // Another round of traversal will have to be done till all ships sunk
+
+    /////////////////////////////////////////////
     // Answer Concept (same as Random):
+    /////////////////////////////////////////////
     // Make a copy of world (ships and it's coordinates) since world is not public
     // Once enemy guesses hit, remove coordinate from arraylist
     // Once all of a ship's coordinates are hit, ship is removed from arraylist myShipsAreSinking
     // Send myAnswer accordingly
 
+    /////////////////////////////////////////////
     // Average Wins/Losses against Random Player
+    /////////////////////////////////////////////
+
     // 10 x 10 Board: Location 1 vs Location 2
     // Game 1: random vs greedy
     // Random - 98 rounds to destroy opponent's ships.
@@ -73,6 +89,53 @@ public class GreedyGuessPlayer  implements Player{
     // Random - 97 rounds to destroy opponent's ships.
     // Greedy - 69 rounds to destroy opponent's ships.
 
+    // Games in non-rendering mode 10 x 10: random vs greedy
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof RandomGuessPlayer or GreedyGuessPlayer
+    // P1 | RandomGuessPlayer: 92
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 94
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 97
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 100
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 89
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 99
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 100
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 94
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 99
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | RandomGuessPlayer: 97
+    // P2 | GreedyGuessPlayer: 58 *
+
+    // Games in non-rendering mode 10 x 10: greedy vs random
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof RandomGuessPlayer or GreedyGuessPlayer
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 96
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 97
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 99
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 100
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 99
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 94
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 98
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 100
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 99
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | RandomGuessPlayer: 97
+    
+
     // 50 x 50 Board: Location 1 vs Location 2
     // TimeUnit.MILLISECONDS.sleep(10)
     // 1 minute to render the board
@@ -86,20 +149,66 @@ public class GreedyGuessPlayer  implements Player{
     // Random - 2429 rounds to destroy opponent's ships.
     // Greedy - 178 rounds to destroy opponent's ships.
 
-    // Games in non-rendering mode 50 x 50: greedy vs random
-    // Greedy   -   229     229     229     229     229
-    // Random   -   2466    2366    2498    2441    2295
-
     // Games in non-rendering mode 50 x 50: random vs greedy
-    // Random   -   2393    2328    2464    2313    2483
-    // Greedy   -   178     178     178     178     178
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof RandomGuessPlayer or GreedyGuessPlayer
+    // P1 | RandomGuessPlayer: 2407
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2373
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2500
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2467
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 1760
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2323
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2435
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2395
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2262
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | RandomGuessPlayer: 2468
+    // P2 | GreedyGuessPlayer: 178 *
+    
 
+    // Games in non-rendering mode 50 x 50: greedy vs random
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof RandomGuessPlayer or GreedyGuessPlayer
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2317
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2368
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2461
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2262
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2425
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2362
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2328
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2493
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2376
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | RandomGuessPlayer: 2399
+    
+
+    /////////////////////////////////////////////
     // Observations:
+    /////////////////////////////////////////////
     // Given the same location files 1 & 2, Greedy Player will always have the same number of rounds as
     //      it's very predictable due to the checkerboard pattern
     // Random Player will almost always take > 95% of rounds
     // Greedy Player will win all the time against Random Player
     // In bigger board (50x50), Greedy Player will take about 7% of 2500 rounds whilst Random Player again takes > 95% rounds
+    // In bigger board (50x50), the given ship layouts will place the ships in bottom left corner of the world.
+    // Thus, Greedy will take significantly faster than random
+    // If the ships are further away from the checkerboard starting pattern, Greedy will take more shots as it will traverse
+    //      almost the whole board
 
     // introduced variables
     

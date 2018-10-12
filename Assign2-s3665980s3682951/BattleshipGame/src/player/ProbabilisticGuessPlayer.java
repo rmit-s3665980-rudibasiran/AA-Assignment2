@@ -19,34 +19,41 @@ import java.util.Random;
 
 public class ProbabilisticGuessPlayer  implements Player{
 
+    /////////////////////////////////////////////
     // Guess Concept:
+    /////////////////////////////////////////////
     // Create array class GuessMatrix which consists of int score to keep track of probability of that cell having a ship
-    // and a boolean (shotAttempted) which tracks whether that cell's has been attempted; this boolean is similar to what
-    // was implemented in the Random and Greedy player model
+    //      and a boolean (shotAttempted) which tracks whether that cell's has been attempted; this boolean is similar to what
+    //      was implemented in the Random and Greedy player model
     // A cell score (probability) is increased when it can fit the length of the ship upwards, downwards, rightwards and leftwards
     // This is done for each row and each column for each ship and for cells which has not been sent as a guess
-    // If the matrix is not cleared, this implementation takes longer, as long as Random
+    // If the matrix is not cleared, this implementation takes longer; it will take as long as Random player implementation
     // This is probably due to large scores being kept
     // In hunt mode, we find the cell with the largest probabilty score and push out as a guess
     // Initially, we took the first occurrence of the largest score but decided to make it random
-    // as first occurrence will traverse a very big board like 50x50 slowly
+    //      as first occurrence will traverse a very big board like 50x50 slowly
     // Once a cell has been indicated as hit/miss, the matrix is cleared and probabilites recalculated again
     // If a ship is sunk, again, the matrix is cleared and probablilites recalculated but with 1 lesser ship
     // No invalid/repeated guesses were made
 
     // If there is a hit, it goes into target mode which is the same exact implementation of Greedy player where coordinates of the
-    // right, down, left and up of the hit cell is added to a target list
+    //      right, down, left and up of the hit cell is added to a target list
     // Once the target list is not empty, coordinates are popped out and sent as a guess
     // Iterate through target list. If hit again, add on more adjacent coordinates.
     // Again, target list is not cleared when ship is sunk as there could be adjacent ships
 
+    /////////////////////////////////////////////
     // Answer Concept (same as Random):
+    /////////////////////////////////////////////
     // Make a copy of world (ships and it's coordinates) since world is not public
     // Once enemy guesses hit, remove coordinate from arraylist
     // Once all of a ship's coordinates are hit, ship is removed from arraylist myShipsAreSinking
     // Send myAnswer accordingly
 
+    /////////////////////////////////////////////
     // Average Wins/Losses against Random Player
+    /////////////////////////////////////////////
+
     // 10 x 10 Board: Location 1 vs Location 2
     // Game 1: random vs prob
     // Random   - 95 rounds to destroy opponent's ships.
@@ -72,7 +79,57 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Random   - 96  rounds to destroy opponent's ships.
     // Prob     - 66  rounds to destroy opponent's ships.
 
-   
+    // Games in non-rendering mode 10 x 10: prob vs random
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
+
+    // P1 | ProbabilisticGuessPlayer: 88 *
+    // P2 | RandomGuessPlayer: 96
+    // P1 | ProbabilisticGuessPlayer: 95 *
+    // P2 | RandomGuessPlayer: 97
+    // P1 | ProbabilisticGuessPlayer: 89 *
+    // P2 | RandomGuessPlayer: 98
+    // P1 | ProbabilisticGuessPlayer: 86 *
+    // P2 | RandomGuessPlayer: 99
+    // P1 | ProbabilisticGuessPlayer: 95 *
+    // P2 | RandomGuessPlayer: 97
+    // P1 | ProbabilisticGuessPlayer: 95 *
+    // P2 | RandomGuessPlayer: 99
+    // P1 | ProbabilisticGuessPlayer: 88 *
+    // P2 | RandomGuessPlayer: 98
+    // P1 | ProbabilisticGuessPlayer: 89 *
+    // P2 | RandomGuessPlayer: 91
+    // P1 | ProbabilisticGuessPlayer: 89
+    // P2 | RandomGuessPlayer: 87 *
+    // P1 | ProbabilisticGuessPlayer: 91
+    // P2 | RandomGuessPlayer: 89 *
+    
+    
+    // Games in non-rendering mode 10 x 10: random vs prob
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
+
+    // P1 | RandomGuessPlayer: 95
+    // P2 | ProbabilisticGuessPlayer: 51 *
+    // P1 | RandomGuessPlayer: 98
+    // P2 | ProbabilisticGuessPlayer: 71 *
+    // P1 | RandomGuessPlayer: 97
+    // P2 | ProbabilisticGuessPlayer: 53 *
+    // P1 | RandomGuessPlayer: 100
+    // P2 | ProbabilisticGuessPlayer: 66 *
+    // P1 | RandomGuessPlayer: 95
+    // P2 | ProbabilisticGuessPlayer: 66 *
+    // P1 | RandomGuessPlayer: 95
+    // P2 | ProbabilisticGuessPlayer: 68 *
+    // P1 | RandomGuessPlayer: 97
+    // P2 | ProbabilisticGuessPlayer: 60 *
+    // P1 | RandomGuessPlayer: 100
+    // P2 | ProbabilisticGuessPlayer: 41 *
+    // P1 | RandomGuessPlayer: 99
+    // P2 | ProbabilisticGuessPlayer: 67 *
+    // P1 | RandomGuessPlayer: 90
+    // P2 | ProbabilisticGuessPlayer: 60 *
+    
 
     // 50 x 50 Board: Location 1 vs Location 2
     // TimeUnit.MILLISECONDS.sleep(10)
@@ -88,19 +145,64 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Prob     - 936 rounds to destroy opponent's ships.
 
     // Games in non-rendering mode 50 x 50: prob vs random
-    // Prob     -   1853    1656    1729    1753    1684
-    // Random   -   2391    2075    2390    2392    2393
-    
-    // Games in non-rendering mode 50 x 50: random vs prob
-    // Random   -   2495    2368    2230    2482    2398
-    // Prob     -   709     690     1197    857     1271
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
 
+    // P1 | ProbabilisticGuessPlayer: 1689 *
+    // P2 | RandomGuessPlayer: 2314
+    // P1 | ProbabilisticGuessPlayer: 1637 *
+    // P2 | RandomGuessPlayer: 2443
+    // P1 | ProbabilisticGuessPlayer: 1647 *
+    // P2 | RandomGuessPlayer: 2427
+    // P1 | ProbabilisticGuessPlayer: 1759 *
+    // P2 | RandomGuessPlayer: 2323
+    // P1 | ProbabilisticGuessPlayer: 1636 *
+    // P2 | RandomGuessPlayer: 2488
+    // P1 | ProbabilisticGuessPlayer: 1680 *
+    // P2 | RandomGuessPlayer: 2492
+    // P1 | ProbabilisticGuessPlayer: 1687 *
+    // P2 | RandomGuessPlayer: 2423
+    // P1 | ProbabilisticGuessPlayer: 1727 *
+    // P2 | RandomGuessPlayer: 2424
+    // P1 | ProbabilisticGuessPlayer: 1822 *
+    // P2 | RandomGuessPlayer: 2447
+    // P1 | ProbabilisticGuessPlayer: 1694 *
+    // P2 | RandomGuessPlayer: 2452
+
+
+    // Games in non-rendering mode 50 x 50: random vs prob
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
+
+    // P1 | RandomGuessPlayer: 2467
+    // P2 | ProbabilisticGuessPlayer: 1160 *
+    // P1 | RandomGuessPlayer: 2319
+    // P2 | ProbabilisticGuessPlayer: 1035 *
+    // P1 | RandomGuessPlayer: 2290
+    // P2 | ProbabilisticGuessPlayer: 844 *
+    // P1 | RandomGuessPlayer: 2446
+    // P2 | ProbabilisticGuessPlayer: 867 *
+    // P1 | RandomGuessPlayer: 2459
+    // P2 | ProbabilisticGuessPlayer: 924 *
+    // P1 | RandomGuessPlayer: 2417
+    // P2 | ProbabilisticGuessPlayer: 987 *
+    // P1 | RandomGuessPlayer: 2489
+    // P2 | ProbabilisticGuessPlayer: 677 *
+    // P1 | RandomGuessPlayer: 2436
+    // P2 | ProbabilisticGuessPlayer: 545 *
+    // P1 | RandomGuessPlayer: 2398
+    // P2 | ProbabilisticGuessPlayer: 1485 *
+    // P1 | RandomGuessPlayer: 2459
+    // P2 | ProbabilisticGuessPlayer: 633 *
+
+    /////////////////////////////////////////////
     // Observations:
+    /////////////////////////////////////////////
     
     // Prob always wins against Random
     // Probability seems to take longer when it is player 1 but is very good when it is player 2
     // Again, Random takes about > 95% of the rounds
-    // Prob takes between 49 to 79, average of 62% of rounds
+    // In smaller boards, Prob takes average of 62% of rounds
     // For bigger grids, Random is > 95% whilst Prob is about 37% efficiency
 
     /////////////////////////////////////////////
@@ -132,6 +234,58 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Greedy   - 58 rounds to destroy opponent's ships.
     // Prob     - 73 rounds to destroy opponent's ships.
 
+    // Games in non-rendering mode 10 x 10: prob vs greedy
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
+
+    // P1 | ProbabilisticGuessPlayer: 91
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 91
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 94
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 92
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 94
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 94
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 89
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 90
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 93
+    // P2 | GreedyGuessPlayer: 58 *
+    // P1 | ProbabilisticGuessPlayer: 90
+    // P2 | GreedyGuessPlayer: 58 *
+    
+
+
+    // Games in non-rendering mode 10 x 10: greedy vs prob
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
+
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 60 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 55 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 61 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 58 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 64 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 57 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 55 *
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 69
+    // P1 | GreedyGuessPlayer: 69
+    // P2 | ProbabilisticGuessPlayer: 61 *
+    // P1 | GreedyGuessPlayer: 69 *
+    // P2 | ProbabilisticGuessPlayer: 73
+
     // 50 x 50 Board: Location 1 vs Location 2
     // TimeUnit.MILLISECONDS.sleep(10)
     // 1 minute to render the board
@@ -145,21 +299,68 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Greedy   - 178 rounds to destroy opponent's ships.
     // Prob     - 942 rounds to destroy opponent's ships.
 
-    // Games in non-rendering mode 50 x 50: greedy vs prob
-    // Greedy   -   229     229     229     229     229
-    // Prob     -   1108    935     942     1299    901
-
     // Games in non-rendering mode 50 x 50: prob vs greedy
-    // Prob     -   1793    1756    1666    1705    1794
-    // Greedy   -   178     178     178     178     178
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
 
+    // P1 | ProbabilisticGuessPlayer: 1760
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1719
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1707
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1636
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1680
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1791
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1697
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1797
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1733
+    // P2 | GreedyGuessPlayer: 178 *
+    // P1 | ProbabilisticGuessPlayer: 1624
+    // P2 | GreedyGuessPlayer: 178 *
+    
+
+    // Games in non-rendering mode 50 x 50: greedy vs prob
+    // Amendments made to BattleShipMain.java to check whether P1/P2 were instanceof 
+    //      RandomGuessPlayer/GreedyGuessPlayer/ProbabilisticGuessPlayer
+
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 1278
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 930
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 1013
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 924
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 844
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 880
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 867
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 783
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 703
+    // P1 | GreedyGuessPlayer: 229 *
+    // P2 | ProbabilisticGuessPlayer: 727
+
+    /////////////////////////////////////////////
     // Observations:
+    /////////////////////////////////////////////
     // Given the same location files 1 & 2, Greedy Player will always have the same number of rounds as
     //      it's very predictable due to the checkerboard pattern
     // Again, Probability seems to take longer when it is player 1 but is very good when it is player 2
     // In bigger boards, Greedy will take longer to execute if the ships are further away from the starting checkerboard pattern
     // Since the provided layouts are relatively closer to the bottom left of the grid, Greedy will always win
-    // For smaller boards, it's a draw as Probability will win as many as Greedy
+    // For smaller boards, it's almost a draw as Probability (Player 2) will win against Greedy
+    //      and will lose when Greedy is Player 2
+    // This seems to suggest that for small boards, layout 2 is the layout to avoid as you will lose first!
   
     // introduced variables
    
