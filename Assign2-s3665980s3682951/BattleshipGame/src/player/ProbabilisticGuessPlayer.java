@@ -72,26 +72,40 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Random   - 96  rounds to destroy opponent's ships.
     // Prob     - 66  rounds to destroy opponent's ships.
 
+   
+
     // 50 x 50 Board: Location 1 vs Location 2
     // TimeUnit.MILLISECONDS.sleep(10)
     // 1 minute to render the board
     // 3 minutes to complete the game
 
-    // Game 1: random vs greedy
+    // Game 1: random vs prob
     // Random   - 2449 rounds to destroy opponent's ships.
     // Prob     - 810 rounds to destroy opponent's ships.
 
-    // Game 2: greedy vs random
+    // Game 2: prob vs random
     // Random   - 2495 rounds to destroy opponent's ships.
     // Prob     - 936 rounds to destroy opponent's ships.
 
-    // Observations:
-    // Prob always wins against Random
-    // Again, Random takes about > 95% rounds
-    // Prob takes between 49 to 79, average of 62% of rounds
-    // For bigger grids, Random is > 95% whilst Prob is about 34% efficiency
+    // Games in non-rendering mode 50 x 50: prob vs random
+    // Prob     -   1853    1656    1729    1753    1684
+    // Random   -   2391    2075    2390    2392    2393
+    
+    // Games in non-rendering mode 50 x 50: random vs prob
+    // Random   -   2495    2368    2230    2482    2398
+    // Prob     -   709     690     1197    857     1271
 
+    // Observations:
+    
+    // Prob always wins against Random
+    // Probability seems to take longer when it is player 1 but is very good when it is player 2
+    // Again, Random takes about > 95% of the rounds
+    // Prob takes between 49 to 79, average of 62% of rounds
+    // For bigger grids, Random is > 95% whilst Prob is about 37% efficiency
+
+    /////////////////////////////////////////////
     // Average Wins/Losses against Greedy Player
+    /////////////////////////////////////////////
 
     // 10 x 10 Board: Location 1 vs Location 2
     // Game 1: greedy vs prob
@@ -131,13 +145,22 @@ public class ProbabilisticGuessPlayer  implements Player{
     // Greedy   - 178 rounds to destroy opponent's ships.
     // Prob     - 942 rounds to destroy opponent's ships.
 
-    // Observations:
-    // Draw
-    // Probability seems to take longer for layout 2 but is very good for layout 1
-    // Greedy will take longer to execute if the ships are higher up the board from the starting checkerboard pattern
-    //      assuming we start from 0,0
-  
+    // Games in non-rendering mode 50 x 50: greedy vs prob
+    // Greedy   -   229     229     229     229     229
+    // Prob     -   1108    935     942     1299    901
 
+    // Games in non-rendering mode 50 x 50: prob vs greedy
+    // Prob     -   1793    1756    1666    1705    1794
+    // Greedy   -   178     178     178     178     178
+
+    // Observations:
+    // Given the same location files 1 & 2, Greedy Player will always have the same number of rounds as
+    //      it's very predictable due to the checkerboard pattern
+    // Again, Probability seems to take longer when it is player 1 but is very good when it is player 2
+    // In bigger boards, Greedy will take longer to execute if the ships are further away from the starting checkerboard pattern
+    // Since the provided layouts are relatively closer to the bottom left of the grid, Greedy will always win
+    // For smaller boards, it's a draw as Probability will win as many as Greedy
+  
     // introduced variables
    
     public ArrayList<World.ShipLocation> myShipsAreSinking = new ArrayList<>(); // clone of world.shipLocations
@@ -160,6 +183,12 @@ public class ProbabilisticGuessPlayer  implements Player{
     }
 
     public GuessMatrix myProbableGuesses[][]; // matrix of probability scores & attempted guesses
+
+    // direction of checks
+    final int RIGHTWARDS = 0;
+    final int DOWNWARDS = 1;
+    final int LEFTWARDS = 2;
+    final int UPWARDS = 3;
     
     @Override
     public void initialisePlayer(World world) {
@@ -393,7 +422,8 @@ public class ProbabilisticGuessPlayer  implements Player{
                 }
                
                 // initially, we took the first occurrence of the largest but decided to make it random
-                // as first occurrence will traverse a very big board 50x50 slowly
+                // as first occurrence will traverse a very big board 50x50 slowly in draw mode
+                // in non-rendering more, we can probably get away with using the first largest score
                 boolean randomLargestFound = false;
                 while (!randomLargestFound) {
                     
@@ -468,10 +498,10 @@ public class ProbabilisticGuessPlayer  implements Player{
             for (int j = 0; j < myProbableGuesses[i].length; j++) {
                 if (!myProbableGuesses[i][j].shotAttempted) {
                     for (int s = 0; s < myProbableShipGuesses.size(); s++) {
-                        calculateShipRightwards (i, j, s);      // check right
-                        calculateShipDownwards  (i, j, s);      // check down
-                        calculateShipLeftwards  (i, j, s);      // check left
-                        calculateShipUpwards    (i, j, s);      // check up
+                        calculateShipLayoutProb (i, j, s, RIGHTWARDS);  // check right
+                        calculateShipLayoutProb (i, j, s, DOWNWARDS);   // check down
+                        calculateShipLayoutProb (i, j, s, LEFTWARDS);   // check left
+                        calculateShipLayoutProb (i, j, s, UPWARDS);     // check up
                     }
                 }
             }
@@ -495,57 +525,44 @@ public class ProbabilisticGuessPlayer  implements Player{
 
     // see whether the remaining ships can fit into that cell based on length
     // do for rightwards, downwards, leftwards and upwards
-    public void calculateShipRightwards(int r, int c, int s) {
+    public void calculateShipLayoutProb(int r, int c, int s, int direction) {
         int row = r;
-        int col = c + myProbableShipGuesses.get(s).ship.len();
-		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
-                col = c + i;
-                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-                    if (!myProbableGuesses[row][col].shotAttempted) {
-                        myProbableGuesses[row][col].score++;
-                    }
-                }
-            }
-        }
-    }
-
-    public void calculateShipDownwards(int r, int c, int s) {
-        int row = r - myProbableShipGuesses.get(s).ship.len();
         int col = c;
-		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
-                row = r - i;
-                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-                    if (!myProbableGuesses[row][col].shotAttempted) {
-                        myProbableGuesses[row][col].score++;
-                    }
-                }
-            }
-        }
-    }
 
-    public void calculateShipLeftwards(int r, int c, int s) {
-        int row = r;
-        int col = c - myProbableShipGuesses.get(s).ship.len();
-		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
-                col = c - i;
-                if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
-                    if (!myProbableGuesses[row][col].shotAttempted) {
-                        myProbableGuesses[row][col].score++;
-                    }
-                }
-            }
+        // switch used to enhance readability and reusability of code
+        switch (direction) {
+            case RIGHTWARDS:
+                col = c + myProbableShipGuesses.get(s).ship.len();
+                break;
+            case DOWNWARDS:
+                row = r + myProbableShipGuesses.get(s).ship.len();
+                break;
+            case LEFTWARDS:
+                col = c - myProbableShipGuesses.get(s).ship.len();
+                break;
+            case UPWARDS:
+                col = c + myProbableShipGuesses.get(s).ship.len();
+                break;
         }
-    }
 
-    public void calculateShipUpwards(int r, int c, int s) {
-        int row = r + myProbableShipGuesses.get(s).ship.len();
-        int col = c;
+
 		if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
 			for (int i = 0; i < myProbableShipGuesses.get(s).ship.len(); i++) {
-                row = r + i;
+                switch (direction) {
+                    case RIGHTWARDS:
+                        col = c + i;
+                        break;
+                    case DOWNWARDS:
+                        row = r - i;
+                        break;
+                    case LEFTWARDS:
+                        col = c - i;
+                        break;
+                    case UPWARDS:
+                        row = r + i;
+                        break;
+                }
+                
                 if (row >= 0 && row < boardRow && col >= 0 && col < boardCol) {
                     if (!myProbableGuesses[row][col].shotAttempted) {
                         myProbableGuesses[row][col].score++;

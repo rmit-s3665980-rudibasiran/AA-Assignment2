@@ -86,6 +86,14 @@ public class GreedyGuessPlayer  implements Player{
     // Random - 2429 rounds to destroy opponent's ships.
     // Greedy - 178 rounds to destroy opponent's ships.
 
+    // Games in non-rendering mode 50 x 50: greedy vs random
+    // Greedy   -   229     229     229     229     229
+    // Random   -   2466    2366    2498    2441    2295
+
+    // Games in non-rendering mode 50 x 50: random vs greedy
+    // Random   -   2393    2328    2464    2313    2483
+    // Greedy   -   178     178     178     178     178
+
     // Observations:
     // Given the same location files 1 & 2, Greedy Player will always have the same number of rounds as
     //      it's very predictable due to the checkerboard pattern
